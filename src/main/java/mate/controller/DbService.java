@@ -1,11 +1,13 @@
 package mate.controller;
 
 import mate.model.UsersDataSet;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
-import org.hibernate.internal.SessionFactoryImpl;
 import org.hibernate.service.ServiceRegistry;
 
 import java.sql.Connection;
@@ -14,7 +16,7 @@ import java.sql.SQLException;
 public class DbService {
 
     private final static String hibernate_show_sql = "true";
-    private final static String hibernate_hbm2ddl_auto = "create";
+    private final static String hibernate_hbm2ddl_auto = "update";
 
     private final SessionFactory sessionFactory;
 
@@ -23,8 +25,24 @@ public class DbService {
         sessionFactory = getSessionFactory(configuration);
     }
 
-    private long addUser(UsersDataSet usersDataSet) {
-        return 0;
+    public void addUser(String name) {
+        try {
+            Session session = sessionFactory.openSession();
+            Transaction transaction = session.beginTransaction();
+            session.save(new UsersDataSet(name));
+            transaction.commit();
+            session.close();
+        }catch (HibernateException e){
+            e.printStackTrace();
+        }
+
+
+
+
+
+
+
+        //return 0;
     }
 
     private UsersDataSet getUserById(long id) {
@@ -35,48 +53,33 @@ public class DbService {
         return null;
     }
 
-//String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-//        String DB_TYPE = "jdbc:mysql://";
-//        String HOST_NAME = "3.133.58.254"; //aws streamddata0719@gmail.com
-//        String PORT = "3306";
-//        String DB_NAME = "testdb";
-//        String USER = "remote_user";
-//        String PASS = "remote_user";
-//
-//        try {
-//            DriverManager.registerDriver((Driver) Class.forName(JDBC_DRIVER).getDeclaredConstructor().newInstance());
-//            StringBuilder urlString = new StringBuilder();
-//            urlString.
-//                    append(DB_TYPE).
-//                    append(HOST_NAME + ":").
-//                    append(PORT + "/").
-//                    append(DB_NAME + "?").
-//                    append("user=" + USER + "&").
-//                    append("password=" + PASS + "&useSSL=false");
 
 
-    public void printConnectionInfo() throws SQLException {
+    public void printConnectionInfo() {
 
-        Connection connection = sessionFactory.getSessionFactoryOptions().
-                getServiceRegistry().
-                getService(ConnectionProvider.class).
-                getConnection();
-        System.out.println("DatabaseProductName: " + connection.getMetaData().getDatabaseProductName());
-        System.out.println("DataBaseProductVersion: " + connection.getMetaData().getDatabaseProductVersion());
-        System.out.println("DriverName: " + connection.getMetaData().getDriverName());
-        System.out.println("URL: " + connection.getMetaData().getURL());
-        System.out.println("AutoCommit: " + connection.getAutoCommit());
+        try {
+            Connection connection = sessionFactory.getSessionFactoryOptions().
+                    getServiceRegistry().
+                    getService(ConnectionProvider.class).
+                    getConnection();
+            System.out.println("DatabaseProductName: " + connection.getMetaData().getDatabaseProductName());
+            System.out.println("DataBaseProductVersion: " + connection.getMetaData().getDatabaseProductVersion());
+            System.out.println("DriverName: " + connection.getMetaData().getDriverName());
+            System.out.println("URL: " + connection.getMetaData().getURL());
+            System.out.println("AutoCommit: " + connection.getAutoCommit());
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
     }
-    
 
     private Configuration getMySqlConfiguration() {
         Configuration configuration = new Configuration();
         configuration.addAnnotatedClass(UsersDataSet.class);
-        configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
+        configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
         configuration.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");
-        configuration.setProperty("hibernate.connection.url", "jdbc:mysql://3.133.58.254:3306/hibernate_example");
-        configuration.setProperty("hibernate.connection.username", "remote_user");
-        configuration.setProperty("hibernate.connection.password", "remote_user");
+        configuration.setProperty("hibernate.connection.url", "jdbc:mysql://3.133.58.254:3306/hibernate_test?user=remote_user&password=remote_user&useSSL=false");
+        //configuration.setProperty("hibernate.connection.username", "remote_user");
+        //configuration.setProperty("hibernate.connection.password", "remote_user");
         configuration.setProperty("hibernate.show_sql", hibernate_show_sql);
         configuration.setProperty("hibernate.hbm2ddl.auto", hibernate_hbm2ddl_auto);
         return configuration;
