@@ -17,6 +17,11 @@ public class UsersDataSet implements Serializable {
     @Column(name = "name", unique = true, updatable = false)
     private String name;
 
+    @Column(name = "userGroup")
+    private long userGroup;
+
+
+
     @SuppressWarnings("UnusedDeclaration")
     public UsersDataSet() {
     }
@@ -50,11 +55,20 @@ public class UsersDataSet implements Serializable {
         this.name = name;
     }
 
+    public long getUserGroup() {
+        return userGroup;
+    }
+
+    public void setUserGroup(long userGroup) {
+        this.userGroup = userGroup;
+    }
+
     @Override
     public String toString() {
         return "UsersDataSet{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", userGroup=" + userGroup +
                 '}';
     }
 }

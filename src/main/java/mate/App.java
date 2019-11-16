@@ -8,7 +8,7 @@ public class App
 
         DbService dbService = new DbService();
         dbService.printConnectionInfo();
-        dbService.addUser("Dima");
+
 
 
 
