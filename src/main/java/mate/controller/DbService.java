@@ -1,7 +1,7 @@
 package mate.controller;
 
 import mate.model.UserGroup;
-import mate.model.UsersDataSet;
+import mate.model.User;
 import org.hibernate.*;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
@@ -24,25 +24,32 @@ public class DbService {
         sessionFactory = getSessionFactory(configuration);
     }
 
+    private static final SessionFactory getSessionFactory(Configuration configuration) {
+        StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
+        builder.applySettings(configuration.getProperties());
+        ServiceRegistry serviceRegistry = builder.build();
+        return configuration.buildSessionFactory(serviceRegistry);
+    }
+
     public void addUser(String name) {
         try {
             Session session = sessionFactory.openSession();
             Transaction transaction = session.beginTransaction();
-            session.save(new UsersDataSet(name));
+            session.save(new User(name));
             transaction.commit();
             session.close();
-        }catch (HibernateException e){
+        } catch (HibernateException e) {
             e.printStackTrace();
         }
 
         //return 0;
     }
 
-    public UsersDataSet getUserById(long id) {
+    public User getUserById(long id) {
         try {
             Session session = sessionFactory.openSession();
-            return (UsersDataSet) session.get(UsersDataSet.class, id);
-        } catch (HibernateException e){
+            return session.get(User.class, id);
+        } catch (HibernateException e) {
             e.printStackTrace();
         }
         return null;
@@ -51,15 +58,13 @@ public class DbService {
     public long getUserByName(String name) {
         try {
             Session session = sessionFactory.openSession();
-            Criteria criteria = session.createCriteria(UsersDataSet.class);
-            return ((UsersDataSet) criteria.add(Restrictions.eq("name", name)).uniqueResult()).getId();
-        } catch (HibernateException e){
+            Criteria criteria = session.createCriteria(User.class);
+            return ((User) criteria.add(Restrictions.eq("name", name)).uniqueResult()).getId();
+        } catch (HibernateException e) {
             e.printStackTrace();
         }
         return 0;
     }
-
-
 
     public void printConnectionInfo() {
 
@@ -73,16 +78,16 @@ public class DbService {
             System.out.println("DriverName: " + connection.getMetaData().getDriverName());
             System.out.println("URL: " + connection.getMetaData().getURL());
             System.out.println("AutoCommit: " + connection.getAutoCommit());
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     private Configuration getMySqlConfiguration() {
         Configuration configuration = new Configuration();
-        configuration.addAnnotatedClass(UsersDataSet.class);
+        configuration.addAnnotatedClass(User.class);
         configuration.addAnnotatedClass(UserGroup.class);
-        configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
+        configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQ58Dialect");
         configuration.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");
         configuration.setProperty("hibernate.connection.url", "jdbc:mysql://3.133.58.254:3306/hibernate_test?user=remote_user&password=remote_user&useSSL=false");
         //configuration.setProperty("hibernate.connection.username", "remote_user");
@@ -90,13 +95,6 @@ public class DbService {
         configuration.setProperty("hibernate.show_sql", hibernate_show_sql);
         configuration.setProperty("hibernate.hbm2ddl.auto", hibernate_hbm2ddl_auto);
         return configuration;
-    }
-
-    private static final SessionFactory getSessionFactory(Configuration configuration) {
-        StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder();
-        builder.applySettings(configuration.getProperties());
-        ServiceRegistry serviceRegistry = builder.build();
-        return configuration.buildSessionFactory(serviceRegistry);
     }
 
 

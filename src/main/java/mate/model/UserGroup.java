@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "user_groups")
+@Table(name = "groups")
 public class UserGroup implements Serializable {
 
     private static final long serialVersionUID = -1L;
@@ -19,8 +19,10 @@ public class UserGroup implements Serializable {
     @Column(name = "group", nullable = false, unique = true)
     private String groupName;
 
-@Column(name = "group1")
-    private String group1Name;
+    @OneToMany(mappedBy = "userGroup")
+    Set<User> users = new HashSet<>();
+
+
 
 
 
@@ -43,12 +45,11 @@ public class UserGroup implements Serializable {
         this.groupName = groupName;
     }
 
-
-    public String getGroup1Name() {
-        return group1Name;
+    public Set<User> getUsers() {
+        return users;
     }
 
-    public void setGroup1Name(String group1Name) {
-        this.group1Name = group1Name;
+    public void setUsers(Set<User> users) {
+        this.users = users;
     }
 }

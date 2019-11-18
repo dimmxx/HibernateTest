@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "users")
-public class UsersDataSet implements Serializable {
+public class User implements Serializable {
 
     private static final long serialVersionUID = -8706689714326132798L;
 
@@ -17,23 +17,23 @@ public class UsersDataSet implements Serializable {
     @Column(name = "name", unique = true, updatable = false)
     private String name;
 
-    @Column(name = "userGroup")
-    private long userGroup;
-
+    @ManyToOne
+    @JoinColumn(name = "userGroup")
+    private UserGroup userGroup;
 
 
     @SuppressWarnings("UnusedDeclaration")
-    public UsersDataSet() {
+    public User() {
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    public UsersDataSet(long id, String name) {
+    public User(long id, String name) {
         this.setId(id);
         this.setName(name);
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    public UsersDataSet(String name) {
+    public User(String name) {
         this.setId(-1);
         this.setName(name);
     }
@@ -55,11 +55,12 @@ public class UsersDataSet implements Serializable {
         this.name = name;
     }
 
-    public long getUserGroup() {
+
+    public UserGroup getUserGroup() {
         return userGroup;
     }
 
-    public void setUserGroup(long userGroup) {
+    public void setUserGroup(UserGroup userGroup) {
         this.userGroup = userGroup;
     }
 
